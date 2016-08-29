@@ -86,7 +86,6 @@ const parent1 = createDrawingSettings();
 const parent2 = createDrawingSettings();
 
 
-console.log(parent1.shapes[0].dotted, parent2.shapes[0].dotted);
 const DRAWING_BITS = 1024 * 60 * 5;
 
 const dnaStream1 = objectToBitStream(parent1, SchemaDrawing, DRAWING_BITS);
@@ -98,4 +97,3 @@ setInterval(() => {
   const childObject = bitStreamToObject(child, SchemaDrawing);
   drawer.draw(childObject);
 }, 250);
-

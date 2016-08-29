@@ -196,28 +196,3 @@ export function base64ToArrayBuffer(base64) {
   }
   return bytes;
 }
-
-//
-// export function test() {
-//   const maxValue = 63;
-//   const a = 23;
-//
-//   const valueLength = requiredBits(maxValue);
-//   console.log(valueLength);
-//   const buffer = new ArrayBuffer(1024 * 1024 * 4);
-//   const bitStream = new BitStream(buffer);
-//
-//   bitStream.writeBits(a, valueLength);
-//
-//   bitStream.byteIndex = 0;
-//
-//
-//   const dataAsString = arrayBufferToBase64(bitStream.view._buffer);
-//
-//   const interpretedString = base64ToArrayBuffer(dataAsString);
-//
-//   const newStream = new BitStream(interpretedString);
-//
-//   const b = newStream.readBits(valueLength, false);
-//   console.log('ok: ', a === b, a, b);
-// }
