@@ -35,7 +35,7 @@ function randomColor() {
 
 function createGradient() {
   return {
-    enabled: true,//threshold(0.3, true, false),
+    enabled: threshold(0.5, true, false),
     type: threshold(0.5, 'linear', 'radial'),
     stops: [{
       position: 0.0,
@@ -68,7 +68,7 @@ function createRandomLineSettings() {
     dotted,
     lineWidth,
     gradient: createGradient(),
-    enabled: true // !!random()
+    enabled: !!random()
   };
 }
 
