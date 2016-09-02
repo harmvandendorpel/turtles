@@ -40,7 +40,7 @@ const drawer = createDrawer({ canvas });
 // console.log(isEqual(toStore, convertBack));
 
 const drawing = imagineDrawing();
-console.log(drawing);
+
 schemaDrawing(drawing);
 if (schemaDrawing.errors !== null) {
   console.log(schemaDrawing.errors);

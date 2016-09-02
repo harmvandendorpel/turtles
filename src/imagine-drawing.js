@@ -21,7 +21,7 @@ function randomFraction() {
   return random(true);
 }
 
-function chance(threshold, yes, no) {
+function threshold(threshold, yes, no) {
   return randomFraction() > threshold ? yes : no;
 }
 
@@ -35,8 +35,8 @@ function randomColor() {
 
 function createGradient() {
   return {
-    enabled: !!random(),
-    type: chance(0.5, 'linear', 'radial'),
+    enabled: true,//threshold(0.3, true, false),
+    type: threshold(0.5, 'linear', 'radial'),
     stops: [{
       position: 0.0,
       color: randomColor()
@@ -55,13 +55,13 @@ function createRandomLineSettings() {
 
   return {
     angles: randomAngleList({
-      damping: chance(0.9, random(0.9, 1.0), 1),
+      damping: threshold(0.9, random(0.9, 1.0), 1),
       count: 1024
     }),
     scale: random(true),
     position: fill(2, randomFraction),
     blendingMode: sample(blendingModes),
-    colorCycleSteps: chance(0.9, random(32), 0),
+    colorCycleSteps: threshold(0.9, random(31), 0),
     startAngle: random(2 * Math.PI),
     color: randomColor(),
     solid,

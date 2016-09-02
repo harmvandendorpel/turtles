@@ -1,13 +1,13 @@
-import { minBy, min, maxBy, reduce, clone, each, last, map } from 'lodash';
+import { minBy, min, max, maxBy, reduce, clone, each, last, map } from 'lodash';
 
 export default function createDrawer({ canvas }) {
-  const ctx = canvas.getContext('2d');
+  const context = canvas.getContext('2d');
   const startPos = [0, 0];
   const pos = clone(startPos);
 
   function startWalk() {
-    ctx.moveTo(startPos[0], startPos[1]);
-    ctx.beginPath();
+    context.moveTo(startPos[0], startPos[1]);
+    context.beginPath();
   }
 
   function walk(distance, angle) {
@@ -99,6 +99,55 @@ export default function createDrawer({ canvas }) {
     return scaleCoords({ coordinates, boundingBox, targetSize: dimensions, position, scale });
   }
 
+  function colorString(color) {
+    const [r, g, b] = color;
+    return `rgb(${r},${g},${b})`;
+  }
+
+  function createGradientStyle({ gradient, boundingBox }) {
+    let result = null;
+
+    const dimensions = [
+      boundingBox[1][0] - boundingBox[0][0],
+      boundingBox[1][1] - boundingBox[0][1]
+    ];
+
+    switch (gradient.type) {
+      case 'radial':
+        const center = [
+          boundingBox[0][0] + gradient.position[0] * dimensions[0],
+          boundingBox[0][1] + gradient.position[1] * dimensions[1]
+        ];
+        result = context.createRadialGradient(
+          center[0],
+          center[1],
+          gradient.position[2] * max(dimensions),
+          center[0],
+          center[1],
+          gradient.position[5] * max(dimensions)
+        );
+        break;
+
+      case 'linear':
+        result = context.createLinearGradient(
+          boundingBox[0][0] + gradient.position[0] * dimensions[0],
+          boundingBox[0][1] + gradient.position[1] * dimensions[1],
+          boundingBox[1][0] + gradient.position[3] * dimensions[0],
+          boundingBox[1][1] + gradient.position[4] * dimensions[1]
+        );
+        break;
+
+      default:
+        throw new Error('Unknown gradient type');
+    }
+
+    gradient.stops.forEach((stop) => {
+      result.addColorStop(stop.position, colorString(stop.color));
+    });
+
+    return result;
+  }
+
   function shape({
     enabled,
     lineWidth,
@@ -110,7 +159,8 @@ export default function createDrawer({ canvas }) {
     scale,
     color,
     solid,
-    dotted
+    dotted,
+    gradient
   }) {
     if (!enabled) return;
     const coordinates = calculateShape({
@@ -121,7 +171,7 @@ export default function createDrawer({ canvas }) {
       scale
     });
 
-    ctx.globalCompositeOperation = blendingMode;
+    context.globalCompositeOperation = blendingMode;
 
     startWalk();
     let colorCycle = 0;
@@ -129,26 +179,29 @@ export default function createDrawer({ canvas }) {
     each(coordinates, (coordinate) => {
       (colorCycle > colorCycleSteps / 2 && !dotted
         ?
-        ctx.moveTo :
-        ctx.lineTo
+        context.moveTo :
+        context.lineTo
       )
-      .apply(ctx, coordinate);
+      .apply(context, coordinate);
 
       if (colorCycle-- < 0) colorCycle = colorCycleSteps;
     });
 
-    ctx.lineWidth = lineWidth;
+    context.lineWidth = lineWidth;
 
-    const [r, g, b] = color;
-    const rgbString = `rgb(${r},${g},${b})`;
+    let style = colorString(color);
+    if (gradient.enabled && solid) {
+      style = createGradientStyle({ gradient, boundingBox: getBoundingBox(coordinates) });
+    }
+
     if (solid) {
-      ctx.strokeStyle = null;
-      ctx.fillStyle = rgbString;
-      ctx.fill();
+      context.strokeStyle = null;
+      context.fillStyle = style;
+      context.fill();
     } else {
-      ctx.fillStyle = null;
-      ctx.strokeStyle = rgbString;
-      ctx.stroke();
+      context.fillStyle = null;
+      context.strokeStyle = style;
+      context.stroke();
     }
   }
 
@@ -157,10 +210,10 @@ export default function createDrawer({ canvas }) {
   }
 
   function clear() {
-    ctx.save();
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.restore();
+    context.save();
+    context.setTransform(1, 0, 0, 1, 0, 0);
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.restore();
   }
 
   return { shape, clear, draw };
