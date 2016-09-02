@@ -1,5 +1,6 @@
 const ColorSchema = {
   type: 'array',
+  required: true,
   items: {
     type: 'integer',
     required: true,
@@ -8,6 +9,18 @@ const ColorSchema = {
   },
   minItems: 3,
   maxItems: 3
+};
+
+const FractionSchema = {
+  type: 'number',
+  required: true,
+  minimum: 0,
+  maximum: 1
+};
+
+const RequiredBool = {
+  type: 'boolean',
+  required: true
 };
 
 const SchemaShape = {
@@ -33,12 +46,7 @@ const SchemaShape = {
     },
     position: {
       type: 'array',
-      items: {
-        type: 'number',
-        required: true,
-        minimum: 0,
-        maximum: 1
-      },
+      items: FractionSchema,
       minItems: 2,
       maxItems: 2
     },
@@ -58,23 +66,47 @@ const SchemaShape = {
       maximum: 2 * Math.PI
     },
     color: ColorSchema,
-    dotted: {
-      type: 'boolean',
-      required: true
-    },
-    solid: {
-      type: 'boolean',
-      required: true
-    },
+    dotted: RequiredBool,
+    solid: RequiredBool,
     lineWidth: {
       type: 'number',
       required: true,
       minimum: 0,
       maximum: 10
     },
-    enabled: {
-      type: 'boolean',
-      required: true
+    enabled: RequiredBool,
+    gradient: {
+      additionalProperties: false,
+      type: 'object',
+      required: true,
+      properties: {
+        enabled: RequiredBool,
+        type: {
+          required: true,
+          enum: ['linear', 'radial']
+        },
+        stops: {
+          type: 'array',
+          minItems: 2,
+          maxItems: 2,
+          required: true,
+          items: {
+            type: 'object',
+            additionalProperties: false,
+            properties: {
+              color: ColorSchema,
+              position: FractionSchema
+            }
+          }
+        },
+        position: {
+          type: 'array',
+          minItems: 6,
+          maxItems: 6,
+          items: FractionSchema,
+          required: true
+        }
+      }
     }
   }
 };
@@ -86,8 +118,8 @@ const SchemaDrawing = {
   properties: {
     shapes: {
       type: 'array',
-      minItems: 1,
-      maxItems: 1,
+      minItems: 3,
+      maxItems: 3,
       required: true,
       items: SchemaShape
     }
