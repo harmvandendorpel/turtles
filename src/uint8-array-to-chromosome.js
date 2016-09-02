@@ -31,7 +31,6 @@ function padding(obj, str, num) {
   return repeat(str, num - obj.length) + obj;
 }
 
-
 export default function uint8ArrayToChromosome(array) {
   return reduce(array, (result, element) => {
     return result + padding(element.toString(2), '0', bitsPerByte);

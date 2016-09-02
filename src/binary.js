@@ -83,7 +83,7 @@ function reconstructObject(schema, getBits) {
     const range = nodeSchema.maximum - nodeSchema.minimum;
     const maxValue = parseInt(range * floatingRoundingMultiplier, 10);
     const bits = requiredBits(maxValue);
-    return getBits(bits) / floatingRoundingMultiplier +  nodeSchema.minimum;
+    return getBits(bits) / floatingRoundingMultiplier + nodeSchema.minimum;
   }
 
   function processArray(itemSchema) {
